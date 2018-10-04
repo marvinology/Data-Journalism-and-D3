@@ -73,30 +73,30 @@ function renderCircles(circlesGroup, newXScale, chosenXaxis) {
   return circlesGroup;
 }
 
-// function used for updating circles group with new tooltip
-function updateToolTip(chosenXAxis, circlesGroup) {
-  if (chosenXAxis === "Poverty") {
-    var label = "In Poverty(%):";
-  }
-  else {
-    var label = "Age Median:";
-  }
-  var toolTip = d3.tip()
-    .attr("class", "tooltip")
-    .offset([80, -60])
-    .html(function(d) {
-      return (`${d.state}<br>${label} ${d[chosenXAxis]}`);
-    });
-  circlesGroup.call(toolTip);
-  circlesGroup.on("mouseover", function(data) {
-    toolTip.show(data);
-  })
-    // onmouseout event
-    .on("mouseout", function(data, index) {
-      toolTip.hide(data);
-    });
-  return circlesGroup;
-}
+// // function used for updating circles group with new tooltip
+// function updateToolTip(chosenXAxis, circlesGroup) {
+//   if (chosenXAxis === "Poverty") {
+//     var label = "In Poverty(%):";
+//   }
+//   else {
+//     var label = "Age Median:";
+//   }
+//   var toolTip = d3.tip()
+//     .attr("class", "tooltip")
+//     .offset([80, -60])
+//     .html(function(d) {
+//       return (`${d.state}<br>${label} ${d[chosenXAxis]}`);
+//     });
+//   circlesGroup.call(toolTip);
+//   circlesGroup.on("mouseover", function(data) {
+//     toolTip.show(data);
+//   })
+//     // onmouseout event
+//     .on("mouseout", function(data, index) {
+//       toolTip.hide(data);
+//     });
+//   return circlesGroup;
+// }
 // Retrieve data from the CSV file and execute everything below
 d3.csv("assets/data/data.csv").then(function(povertyData) {
   console.log(povertyData);
@@ -150,7 +150,7 @@ d3.csv("assets/data/data.csv").then(function(povertyData) {
   var ageMedianLabel = labelsGroup.append("text")
     .attr("x", 0)
     .attr("y", 40)
-    .attr("value", "ageMoe") // value to grab for event listener
+    .attr("value", "age") // value to grab for event listener
     .classed("inactive", true)
     .text("Age(Median)");
 
@@ -212,7 +212,30 @@ d3.csv("assets/data/data.csv").then(function(povertyData) {
     .text("Obesity High")
 
   // updateToolTip function above csv import
-  var circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
+  //var circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
+
+    // Step 1: Append tooltip div
+  var toolTip = d3.select("body")
+    .append("div")
+    .style("display", "none")
+    .classed("tooltip", true);
+
+  // Step 2: Create "mouseover" event listener to display tooltip
+  circlesGroup.on("mouseover", function(d) {
+    toolTip.style("display", "block")
+        .html(
+          `<strong>${(d.abbr)}<strong><hr>${d.poverty}
+      medal(s) won`)
+        .style("left", d3.event.pageX + "px")
+        .style("top", d3.event.pageY + "px");
+  })
+    // Step 3: Create "mouseout" event listener to hide tooltip
+    .on("mouseout", function() {
+      toolTip.style("display", "none");
+    });
+//
+// });
+
   // x axis labels event listener
   labelsGroup.selectAll("text")
     .on("click", function() {
@@ -234,7 +257,7 @@ d3.csv("assets/data/data.csv").then(function(povertyData) {
         // updates tooltips with new info
         circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
         // changes classes to change bold text
-                if (chosenXAxis === "ageMoe") {
+                if (chosenXAxis === "age") {
                   ageMedianLabel
                     .classed("active", true)
                     .classed("inactive", false);
