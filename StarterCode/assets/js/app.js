@@ -225,7 +225,7 @@ d3.csv("assets/data/data.csv").then(function(povertyData) {
     toolTip.style("display", "block")
         .html(
           `<strong>${(d.abbr)}<strong><hr>${d.poverty}
-      `)
+      ToolTip`)
         .style("left", d3.event.pageX + "px")
         .style("top", d3.event.pageY + "px");
   })
